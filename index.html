@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+        html,
+        body,
+        #map-canvas {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script>
+        var map;
+        var current_node = null;
+        var previous_node = null;
+        var num_vertices = 0;
+        var vertices = [];
+        var newLine = null;
+        var marker = null;
+        var current_marker_state = 0;
+        var pinIcon = new google.maps.MarkerImage(
+            "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFFF00",
+            null, /* size is determined at runtime */
+            null, /* origin is 0,0 */
+            null, /* anchor is bottom center of the scaled image */
+            new google.maps.Size(12, 18)
+        );
+
+
+        function initialize() {
+            var mapOptions = {
+                zoom: 20,
+                center: new google.maps.LatLng(37.339085, -121.8914807),
+                mapTypeId: google.maps.MapTypeId.SATELLITE
+            };
+            map = new google.maps.Map(document.getElementById('map-canvas'),
+                mapOptions);
+            google.maps.event.addListener(map, 'click', function (e) {
+                placeMarker(e.latLng, map);
+            });
+
+            window.addEventListener("keydown", function (e) {
+                if (e.keyCode === 83 && document.activeElement !== 'text') {
+                    set_start_node();
+                    
+                }
+            });
+            window.addEventListener("keydown", function (e) {
+                if (e.keyCode === 69 && document.activeElement !== 'text') {
+                    set_end_node();
+                    
+                }
+            });
+            window.addEventListener("keydown", function (e) {
+                if (e.keyCode === 8 && document.activeElement !== 'text') {
+                    
+                    
+                }
+            });
+            num_nodes = 0;
+            previous_node = {
+                coord: null,
+                prev: null
+            };
+            current_node = {
+                coord: null,
+                prev: null
+            };
+
+
+        }
+
+
+
+
+        function placeMarker(position, map) {
+            marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                icon: pinIcon
+            });
+            google.maps.event.addListener(marker, "click", function (e) {
+                marker_clicked(e.latLng, map); //add event handler for each marker
+            });
+            if (num_vertices != 0) {
+
+                current_node = {
+                    coord: position,
+                    prev: previous_node
+                };
+                newLine = [previous_node.coord, current_node.coord];
+                var path = new google.maps.Polyline({
+                    path: newLine,
+                    strokeColor: '#FF0000'
+                });
+         
+                path.setMap(map);
+
+
+                var connectivity = {
+                    node1: previous_node.coord,
+                    node2: current_node.coord
+                };
+                vertices.push(connectivity);
+
+                previous_node = current_node;
+            } else {
+                current_node = {
+                    coord: position,
+                    prev: null
+                };
+                previous_node = {
+                    coord: position,
+                    prev: null
+                };
+            }
+            num_vertices = num_vertices + 1;
+            //alert(vertices.length);
+            //
+
+        }
+
+        function marker_clicked(position, map) {
+            if (current_marker_state == 0) { //if an existing node is clicked
+                previous_node = {
+                    coord: position,
+                    prev: null
+                };
+            } else if (current_marker_state == 1) {
+                current_node = {
+                    coord: position,
+                    prev: previous_node
+                };
+                newLine = [previous_node.coord, current_node.coord];
+                var path = new google.maps.Polyline({
+                    path: newLine,
+                    strokeColor: '#FF0000'
+                });
+                path.setMap(map);
+                var connectivity = {
+                    node1: previous_node.coord,
+                    node2: current_node.coord
+                };
+                vertices.push(connectivity);
+                previous_node = current_node;
+
+
+            }
+
+
+
+
+
+        }
+
+        function set_start_node() {
+            alert("start");
+            current_marker_state = 0;
+        }
+
+        function set_end_node() {
+            alert("end");
+            current_marker_state = 1;
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+</head>
+
+<body>
+    <div id="map-canvas" style="width:80%; height:80%"></div>
+    <button type="button" onclick="set_start_node()">
+        choose a start node
+    </button>
+    <button type="button" onclick="set_end_node()">
+        choose a end node
+    </button>
+</body>
+
+</html>
