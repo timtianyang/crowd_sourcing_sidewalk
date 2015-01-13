@@ -1,0 +1,1 @@
+This is a simple webpage that enables people to map sidewalks together.
