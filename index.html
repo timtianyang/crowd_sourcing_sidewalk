@@ -23,7 +23,7 @@
         var current_node = null;
         var previous_node = null;
         var num_vertices = 0;
-        var vertices = [];
+
         var newLine = null;
         var marker = null;
 		
@@ -61,14 +61,12 @@
             });
             window.addEventListener("keydown", function (e) {
                 if (e.keyCode === 69 && document.activeElement !== 'text') {
-                    set_end_node();
-                    
+                    set_end_node();                   
                 }
             });
             window.addEventListener("keydown", function (e) {
                 if (e.keyCode === 8 && document.activeElement !== 'text') {
-                    
-                    
+                                    
                 }
             });
             num_nodes = 0;
@@ -79,24 +77,55 @@
             current_node = {
                 coord: null,
                 prev: null
-            };
-
-
-			
-			
-			
-			
-			
-			
-			
-			
-			
+            };		
+			google.maps.event.addListener(map, 'zoom_changed', rescale); 		
         }
 
-
+		function rescale(){
+			var zoom = map.getZoom();
+		
+			if (zoom <= 17) {
+				if(markers[0].getVisible()){
+					for(var i=markers.length-1;i>=0;i--){
+						markers[i].setVisible(false);
+					}
+				}
+			
+			} 
+			else{
+					if(!markers[0].getVisible()){
+						for(var i=markers.length-1;i>=0;i--){
+							markers[i].setVisible(true);
+						}
+					}
+					if(!paths[0].getVisible()){
+						for(var i=paths.length-1;i>=0;i--){
+							paths[i].setVisible(true);
+						}
+					}
+				}
+			
+			if(zoom<=14){
+				if(paths[0].getVisible()){
+					for(var i=paths.length-1;i>=0;i--){
+						paths[i].setVisible(false);
+					}
+				}
+			}
+			else{
+				if(!paths[0].getVisible()){
+					for(var i=paths.length-1;i>=0;i--){
+						paths[i].setVisible(true);
+					}
+				}
+			}
+		}
 
 
         function placeMarker(position, map) {
+			if(map.getZoom()<=17){
+				return;
+			}
             marker = new google.maps.Marker({
                 position: position,
                 map: map,
@@ -115,17 +144,14 @@
                 newLine = [previous_node.coord, current_node.coord];
                 var path = new google.maps.Polyline({
                     path: newLine,
-                    strokeColor: '#1E90FF'
+                    strokeColor: '#1E90FF',
+					geodesic: true,
                 });
          
                 path.setMap(map);
 				paths.push(path);
 
-                var connectivity = {
-                    node1: previous_node.coord,
-                    node2: current_node.coord
-                };
-                vertices.push(connectivity);
+              
 
                 previous_node = current_node;
             } else {
@@ -141,16 +167,17 @@
             num_vertices = num_vertices + 1;
             //alert(vertices.length);
             //
-
+			document.getElementById('status').innerHTML = "You created a new node";
         }
 
         function marker_clicked(position, map) {
-            if (current_marker_state == 0) { //if an existing node is clicked
+            if (current_marker_state == 0) { //start has been clicked
                 previous_node = {
                     coord: position,
                     prev: null
                 };
-            } else if (current_marker_state == 1) {
+				document.getElementById('status').innerHTML = "You just set this node as a start node";
+            } else if (current_marker_state == 1) {//end has been clicked
                 current_node = {
                     coord: position,
                     prev: previous_node
@@ -161,13 +188,9 @@
                     strokeColor: '#1E90FF'
                 });
                 path.setMap(map);
-                var connectivity = {
-                    node1: previous_node.coord,
-                    node2: current_node.coord
-                };
-                vertices.push(connectivity);
+              
                 previous_node = current_node;
-
+				document.getElementById('status').innerHTML = "You just connected two nodes";
 
             }
 
@@ -178,13 +201,15 @@
         }
 
         function set_start_node() {
-            alert("start");
+            
             current_marker_state = 0;
+			document.getElementById('status').innerHTML = "Selecting an start node";
         }
 
         function set_end_node() {
-            alert("end");
+          
             current_marker_state = 1;
+			document.getElementById('status').innerHTML = "Selecting an end node";
         }
 		function undo(){
 			if(paths.length!=0){
@@ -198,11 +223,12 @@
 					num_vertices--;
 				}
 			}
+			document.getElementById('status').innerHTML = "You just hit undo";
 		}
 		
 		function download(filename) {
 			var text="";
-			alert("Summary: \r\n"+paths.length+" paths\r\n"+vertices.length+" vertices in your map");
+			alert("Summary: \r\n"+paths.length+" paths\r\n"+markers.length+" vertices in your map");
 			var Pathsize=paths.length;
 			
 			for(var i=Pathsize-1;i>=0;i--){
@@ -216,6 +242,9 @@
 			pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
 			pom.setAttribute('download', filename);
 			pom.click();
+			
+			document.getElementById('status').innerHTML = "You clicked download";
+
 		}
 		
 		
@@ -233,19 +262,22 @@
 	5. This is a Beta version thus doesn't save anything on the server.
 	</div>
     <div>  
-		<button type="button" onclick="set_start_node()">
+		<button type="button" onclick="set_start_node()" style="width: 150px; height: 60px">
 			choose a start node
 		</button>
-		<button type="button" onclick="set_end_node()">
+		<button type="button" onclick="set_end_node()" style="width: 150px; height: 60px">
 			choose a end node
 		</button>
-		<button type="button" onclick="undo()">
+		<button type="button" onclick="undo()" style="width: 150px; height: 60px">
 			undo
 		</button>
-		<button type="button" onclick="download()">
+		<button type="button" onclick="download()" style="width: 170px; height: 60px">
 			download your mapping
 		</button>
 	</div>
+	<div>
+		Your current mapping status is: <b id="status">Just initialized</b>
+	</div>  
 </body>
 
 </html>
