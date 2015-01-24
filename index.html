@@ -71,12 +71,10 @@
             });
             num_nodes = 0;
             previous_node = {
-                coord: null,
-                prev: null
+                coord: null
             };
             current_node = {
-                coord: null,
-                prev: null
+                coord: null
             };		
 			google.maps.event.addListener(map, 'zoom_changed', rescale); 		
         }
@@ -139,13 +137,13 @@
 
                 current_node = {
                     coord: position,
-                    prev: previous_node
                 };
                 newLine = [previous_node.coord, current_node.coord];
                 var path = new google.maps.Polyline({
                     path: newLine,
                     strokeColor: '#1E90FF',
 					geodesic: true,
+					//editable: true
                 });
          
                 path.setMap(map);
@@ -156,12 +154,10 @@
                 previous_node = current_node;
             } else {
                 current_node = {
-                    coord: position,
-                    prev: null
+                    coord: position
                 };
                 previous_node = {
-                    coord: position,
-                    prev: null
+                    coord: position
                 };
             }
             num_vertices = num_vertices + 1;
@@ -174,13 +170,11 @@
             if (current_marker_state == 0) { //start has been clicked
                 previous_node = {
                     coord: position,
-                    prev: null
                 };
 				document.getElementById('status').innerHTML = "You just set this node as a start node";
             } else if (current_marker_state == 1) {//end has been clicked
                 current_node = {
                     coord: position,
-                    prev: previous_node
                 };
                 newLine = [previous_node.coord, current_node.coord];
                 var path = new google.maps.Polyline({
@@ -188,7 +182,16 @@
                     strokeColor: '#1E90FF'
                 });
                 path.setMap(map);
-              
+				paths.push(path);
+				
+				
+				
+				marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                icon: pinIcon
+				});
+				markers.push(marker);//add a repeated marker to solve popping issue
                 previous_node = current_node;
 				document.getElementById('status').innerHTML = "You just connected two nodes";
 
@@ -215,9 +218,14 @@
 			if(paths.length!=0){
 				paths.pop().setMap(null);
 			}
+			if(current_marker_state == 1){
+				current_marker_state =0;
+			}
 			if(markers.length!=0){
 				markers.pop().setMap(null);
 				num_vertices--;
+				previous_node={coord:markers[markers.length-1].getPosition()};
+				
 				if(markers.length==1){
 					markers.pop().setMap(null);
 					num_vertices--;
