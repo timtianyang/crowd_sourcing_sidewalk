@@ -45,7 +45,8 @@
             var mapOptions = {
                 zoom: 18,
                 center: new google.maps.LatLng(40.438329, -79.956247),
-                mapTypeId: google.maps.MapTypeId.HYBRID  
+                mapTypeId: google.maps.MapTypeId.HYBRID  ,
+				tilt:0
             };
             map = new google.maps.Map(document.getElementById('map-canvas'),
                 mapOptions);
@@ -124,6 +125,9 @@
 			if(map.getZoom()<=17){
 				return;
 			}
+			if(current_marker_state == 1){
+				current_marker_state =0;
+			}
             marker = new google.maps.Marker({
                 position: position,
                 map: map,
@@ -143,6 +147,7 @@
                     path: newLine,
                     strokeColor: '#1E90FF',
 					geodesic: true,
+					strokeWeight: 2
 					//editable: true
                 });
          
@@ -218,9 +223,7 @@
 			if(paths.length!=0){
 				paths.pop().setMap(null);
 			}
-			if(current_marker_state == 1){
-				current_marker_state =0;
-			}
+			
 			if(markers.length!=0){
 				markers.pop().setMap(null);
 				num_vertices--;
