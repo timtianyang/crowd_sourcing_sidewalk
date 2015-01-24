@@ -184,7 +184,8 @@
                 newLine = [previous_node.coord, current_node.coord];
                 var path = new google.maps.Polyline({
                     path: newLine,
-                    strokeColor: '#1E90FF'
+                    strokeColor: '#1E90FF',
+					geodesic: true
                 });
                 path.setMap(map);
 				paths.push(path);
