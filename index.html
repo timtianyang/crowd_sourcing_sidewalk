@@ -125,7 +125,7 @@
 			if(map.getZoom()<=17){
 				return;
 			}
-			if(current_marker_state == 1){
+			if(current_marker_state == 1){//reset state of connection
 				current_marker_state =0;
 			}
             marker = new google.maps.Marker({
@@ -199,7 +199,7 @@
 				markers.push(marker);//add a repeated marker to solve popping issue
                 previous_node = current_node;
 				document.getElementById('status').innerHTML = "You just connected two nodes";
-
+				current_marker_state=0;
             }
 
 
@@ -235,6 +235,9 @@
 				}
 			}
 			document.getElementById('status').innerHTML = "You just hit undo";
+			if(current_marker_state == 1){//reset state of connection
+				current_marker_state =0;
+			}
 		}
 		
 		function download(filename) {
