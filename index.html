@@ -14,6 +14,12 @@
             margin: 0px;
             padding: 0px
         }
+		.talk {
+		border: 1px solid #a1a1a1;
+		padding: 1px 4px; 
+		
+		border-radius: 10px;
+}
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
 	 <script type="text/javascript"
@@ -33,7 +39,7 @@
 		var paths=[];
 		var markers=[];
         var pinIcon = new google.maps.MarkerImage(
-            "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|1E90FF",
+            "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|66FFFF",
             null, /* size is determined at runtime */
             null, /* origin is 0,0 */
             null, /* anchor is bottom center of the scaled image */
@@ -281,13 +287,13 @@
 		<!-- <button type="button" onclick="set_start_node()" style="width: 150px; height: 60px">
 			choose a start node
 		</button> -->
-		<button type="button" onclick="set_end_node()" style="width: 150px; height: 60px">
+		<button type="button" onclick="set_end_node()" style="width: 150px; height: 40px">
 			connect two nodes
 		</button>
-		<button type="button" onclick="undo()" style="width: 150px; height: 60px">
+		<button type="button" onclick="undo()" style="width: 150px; height: 40px">
 			undo
 		</button>
-		<button type="button" onclick="download()" style="width: 170px; height: 60px">
+		<button type="button" onclick="download()" style="width: 170px; height:40px">
 			download your mapping
 		</button>
 	</div>
