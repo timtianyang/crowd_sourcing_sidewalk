@@ -203,6 +203,9 @@
                 map: map,
                 icon: pinIcon
 				});
+				google.maps.event.addListener(marker, "click", function (e) {
+                marker_clicked(e.latLng, map); //add event handler for each marker
+				});
 				markers.push(marker);//add a repeated marker to solve popping issue
                 previous_node = current_node;
 				document.getElementById('status').innerHTML = "You just connected two nodes";
